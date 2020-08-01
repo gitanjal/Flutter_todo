@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/Task.dart';
+import 'package:flutter_todo/task_detail.dart';
 
 void main() => runApp(TodoApp());
 
@@ -24,6 +25,10 @@ class ListScreenWidget extends StatelessWidget {
               return ListTile(
                 onTap: (){
                   print("${taskList[index].title}");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TaskDetailStateful()),
+                  );
                 },
                 title: Text("${taskList[index].title}"),
                 subtitle: Text("${taskList[index].status}"),

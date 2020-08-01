@@ -3,9 +3,10 @@ class Task
   String _userId;
   String _taskId;
   String _title;
+  String _desc;
   String _status;
 
-  Task(this._userId, this._taskId, this._title, this._status);
+  Task(this._userId, this._taskId, this._title,this._desc, this._status);
 
   String get status => _status;
 
@@ -30,11 +31,17 @@ class Task
   set userId(String value) {
     _userId = value;
   }
+
+  String get desc => _desc;
+
+  set desc(String value) {
+    _desc = value;
+  }
 }
 
 
   getDummyTaskList()
   {
-    return List.generate(20, (i)=>Task("1",i.toString(),"Task to do #$i","Incomplete"));
+    return List.generate(20, (i)=>Task("1",i.toString(),"Task to do #$i","Description of task #$i","Incomplete"));
   }
 
