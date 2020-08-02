@@ -46,7 +46,9 @@ class _TaskDetailState extends State<TaskDetailStateful>{
                 child: Text(_markDoneBtnText),
               ),
               RaisedButton(
-                onPressed: () {},
+                onPressed: () {
+                  _showConfirmDeleteDialog();
+                },
                 child: Text("Delete task"),
               )
             ],
@@ -68,6 +70,38 @@ class _TaskDetailState extends State<TaskDetailStateful>{
       _status='Incomplete';
       _markDoneBtnText="Mark as complete";
     });
+  }
+
+  void _deleteTask()
+  {
+
+  }
+
+  Future<void> _showConfirmDeleteDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete task'),
+          content: Text('Confirm?'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Delete'),
+              onPressed: () {
+                 _deleteTask();
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
