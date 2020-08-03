@@ -7,20 +7,20 @@ class TaskDetailStateful extends StatefulWidget {
   }
 }
 
-class _TaskDetailState extends State<TaskDetailStateful>{
-
+class _TaskDetailState extends State<TaskDetailStateful> {
   String _status;
   String _markDoneBtnText;
 
+  bool _deleted = false;
+
   @override
   void initState() {
+    _status = "Incomplete";
 
-    _status="Incomplete";
-
-    if(_status=="Incomplete")
-      _markDoneBtnText="Mark as complete";
+    if (_status == "Incomplete")
+      _markDoneBtnText = "Mark as complete";
     else
-      _markDoneBtnText="Mark as incomplete";
+      _markDoneBtnText = "Mark as incomplete";
 
     super.initState();
   }
@@ -29,79 +29,82 @@ class _TaskDetailState extends State<TaskDetailStateful>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: <Widget>[
-          Text("Task Title"),
-          Text(_status),
-          Text("Task Description"),
-          Row(
-            children: <Widget>[
-              RaisedButton(
-                onPressed: () {
-                    if(_status=='Incomplete')
-                      markAsComplete();
-                    else
-                      markAsIncomplete();
-                },
-                child: Text(_markDoneBtnText),
-              ),
-              RaisedButton(
-                onPressed: () {
-                  _showConfirmDeleteDialog();
-                },
-                child: Text("Delete task"),
+      body: Container(
+        child: (_deleted)
+            ? Center(
+                child: Text("Successfully deleted the task"),
               )
-            ],
-          )
-        ],
+            : Column(
+                children: <Widget>[
+                  Text("Task Title"),
+                  Text(_status),
+                  Text("Task Description"),
+                  Row(
+                    children: <Widget>[
+                      RaisedButton(
+                        onPressed: () {
+                          if (_status == 'Incomplete')
+                            markAsComplete();
+                          else
+                            markAsIncomplete();
+                        },
+                        child: Text(_markDoneBtnText),
+                      ),
+                      RaisedButton(
+                        onPressed: () {
+                          showDialog<void>(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Delete task'),
+                                content: Text('Confirm?'),
+                                actions: <Widget>[
+                                  FlatButton(
+                                    child: Text('Delete'),
+                                    onPressed: () {
+                                      _deleteTask();
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: Text("Delete task"),
+                      )
+                    ],
+                  )
+                ],
+              ),
       ),
     );
   }
 
   void markAsComplete() {
     setState(() {
-      _status='Complete';
-      _markDoneBtnText="Mark as incomplete";
+      _status = 'Complete';
+      _markDoneBtnText = "Mark as incomplete";
     });
   }
 
   void markAsIncomplete() {
     setState(() {
-      _status='Incomplete';
-      _markDoneBtnText="Mark as complete";
+      _status = 'Incomplete';
+      _markDoneBtnText = "Mark as complete";
     });
   }
 
-  void _deleteTask()
-  {
-
-  }
-
-  Future<void> _showConfirmDeleteDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Delete task'),
-          content: Text('Confirm?'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Delete'),
-              onPressed: () {
-                 _deleteTask();
-              },
-            ),
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  void _deleteTask() {
+    setState(() {
+      _deleted=true;
+    });
   }
 }
-
