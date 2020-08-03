@@ -29,62 +29,60 @@ class _TaskDetailState extends State<TaskDetailStateful> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Container(
-        child: (_deleted)
-            ? Center(
-                child: Text("Successfully deleted the task"),
-              )
-            : Column(
-                children: <Widget>[
-                  Text("Task Title"),
-                  Text(_status),
-                  Text("Task Description"),
-                  Row(
-                    children: <Widget>[
-                      RaisedButton(
-                        onPressed: () {
-                          if (_status == 'Incomplete')
-                            markAsComplete();
-                          else
-                            markAsIncomplete();
-                        },
-                        child: Text(_markDoneBtnText),
-                      ),
-                      RaisedButton(
-                        onPressed: () {
-                          showDialog<void>(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Delete task'),
-                                content: Text('Confirm?'),
-                                actions: <Widget>[
-                                  FlatButton(
-                                    child: Text('Delete'),
-                                    onPressed: () {
-                                      _deleteTask();
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  FlatButton(
-                                    child: Text('Cancel'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        child: Text("Delete task"),
-                      )
-                    ],
-                  )
-                ],
-              ),
-      ),
+      body: (_deleted)
+          ? Center(
+              child: Text("Successfully deleted the task"),
+            )
+          : Column(
+              children: <Widget>[
+                Text("Task Title"),
+                Text(_status),
+                Text("Task Description"),
+                Row(
+                  children: <Widget>[
+                    RaisedButton(
+                      onPressed: () {
+                        if (_status == 'Incomplete')
+                          markAsComplete();
+                        else
+                          markAsIncomplete();
+                      },
+                      child: Text(_markDoneBtnText),
+                    ),
+                    RaisedButton(
+                      onPressed: () {
+                        showDialog<void>(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Delete task'),
+                              content: Text('Confirm?'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: Text('Delete'),
+                                  onPressed: () {
+                                    _deleteTask();
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                FlatButton(
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: Text("Delete task"),
+                    )
+                  ],
+                )
+              ],
+            ),
     );
   }
 
