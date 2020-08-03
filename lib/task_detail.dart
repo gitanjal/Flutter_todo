@@ -47,7 +47,31 @@ class _TaskDetailState extends State<TaskDetailStateful>{
               ),
               RaisedButton(
                 onPressed: () {
-                  _showConfirmDeleteDialog();
+                  showDialog<void>(
+                    context: context,
+                    barrierDismissible: false, // user must tap button!
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Delete task'),
+                        content: Text('Confirm?'),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text('Delete'),
+                            onPressed: () {
+                              _deleteTask();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          FlatButton(
+                            child: Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 child: Text("Delete task"),
               )
@@ -77,31 +101,5 @@ class _TaskDetailState extends State<TaskDetailStateful>{
 
   }
 
-  Future<void> _showConfirmDeleteDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Delete task'),
-          content: Text('Confirm?'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Delete'),
-              onPressed: () {
-                 _deleteTask();
-              },
-            ),
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
 
