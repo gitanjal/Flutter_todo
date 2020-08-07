@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/Task.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class AddTask extends StatefulWidget {
   @override
@@ -6,11 +9,11 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
-
-  final _formKey=GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   final controllerTitle = TextEditingController();
   final controllerDesc = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +26,10 @@ class _AddTaskState extends State<AddTask> {
             TextFormField(
               controller: controllerTitle,
               decoration: InputDecoration(hintText: 'Task title'),
-              validator: (value){
-                if(value.isEmpty)
-                  {
-                    return 'Please enter a title';
-                  }
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter a title';
+                }
                 return null;
               },
             ),
@@ -39,8 +41,16 @@ class _AddTaskState extends State<AddTask> {
             ),
             RaisedButton(
               onPressed: () {
-                if(_formKey.currentState.validate()) {
+                if (_formKey.currentState.validate()) {
                   print('Task title is ${controllerTitle.text}');
+
+                  Map<String, dynamic> map = {
+                    'title': controllerTitle.text,
+                    'desc': controllerDesc.text,
+                    'user_id': 1,
+                    'status': 'Incomplete'
+                  };
+                  _addToDB(map);
                 }
               },
               child: Text('Add Task'),
@@ -49,5 +59,20 @@ class _AddTaskState extends State<AddTask> {
         ),
       ),
     );
+  }
+
+  _addToDB(Map task) async {
+    final database = await openDatabase(
+      join(await getDatabasesPath(), 'todo_database.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER, title TEXT, desc TEXT,status TEXT)",
+        );
+      },
+      version: 1,
+    );
+
+    int row = await database.insert('tasks', task);
+    print('---------$row');
   }
 }
