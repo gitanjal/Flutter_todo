@@ -15,18 +15,22 @@ class TodoApp extends StatelessWidget {
   }
 }
 
-class ListScreenWidget extends StatelessWidget {
-  final List<Task> taskList = getDummyTaskList();
+class ListScreenWidget extends StatefulWidget {
+  @override
+  _ListScreenWidgetState createState() => _ListScreenWidgetState();
+}
+
+class _ListScreenWidgetState extends State<ListScreenWidget> {
+  Future<List<Task>> taskList;
+
+  @override
+  void initState() {
+    super.initState();
+    taskList = _getTasksFromDB();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    _getTasksFromDB().then((taskList){
-      taskList.forEach((task){
-        print('----${task.title}');
-      });
-    });
-
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
@@ -39,28 +43,52 @@ class ListScreenWidget extends StatelessWidget {
       ),
       appBar: AppBar(),
       body: Container(
-          child: ListView.builder(
-              itemCount: taskList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  onTap: () {
-                    print("${taskList[index].title}");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => TaskDetailStateful()),
+        child: FutureBuilder(
+        future: taskList,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.data == null) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            if (snapshot.data.length == 0) {
+              return Center(
+                child: Text('No data'),
+              );
+            } else
+              return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      onTap: () {
+                        print("${snapshot.data[index].title}");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TaskDetailStateful()),
+                        ).then((value) {
+                          setState(() {});
+                        });
+                      },
+                      title: Text("${snapshot.data[index].title}"),
+                      subtitle: Text("${snapshot.data[index].status}"),
                     );
-                  },
-                  title: Text("${taskList[index].title}"),
-                  subtitle: Text("${taskList[index].status}"),
-                );
-              })),
+                  });
+          }
+        },
+      )),
     );
   }
 
   Future<List<Task>> _getTasksFromDB() async {
-    final database =await openDatabase(
+    final database = await openDatabase(
       join(await getDatabasesPath(), 'todo_database.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER, title TEXT, desc TEXT,status TEXT)",
+        );
+      },
+      version: 1,
     );
 
     final List<Map<String, dynamic>> taskMaps = await database.query('tasks');

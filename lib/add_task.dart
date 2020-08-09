@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/Task.dart';
+import 'package:flutter_todo/task_detail.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -50,7 +51,7 @@ class _AddTaskState extends State<AddTask> {
                     'user_id': 1,
                     'status': 'Incomplete'
                   };
-                  _addToDB(map);
+                  _addToDB(map,context);
                 }
               },
               child: Text('Add Task'),
@@ -61,7 +62,7 @@ class _AddTaskState extends State<AddTask> {
     );
   }
 
-  _addToDB(Map task) async {
+  _addToDB(Map task,BuildContext context) async {
     final database = await openDatabase(
       join(await getDatabasesPath(), 'todo_database.db'),
       onCreate: (db, version) {
@@ -74,5 +75,7 @@ class _AddTaskState extends State<AddTask> {
 
     int row = await database.insert('tasks', task);
     print('---------$row');
+
+
   }
 }
