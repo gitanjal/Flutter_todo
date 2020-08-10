@@ -65,7 +65,7 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => TaskDetailStateful()),
+                              builder: (context) => TaskDetailStateful(snapshot.data[index].taskId)),
                         ).then((value) {
                           setState(() {});
                         });

@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/Task.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class TaskDetailStateful extends StatefulWidget {
+  final String _taskId;
+
+  TaskDetailStateful(this._taskId);
+
   @override
   State<StatefulWidget> createState() {
     return _TaskDetailState();
@@ -13,14 +20,20 @@ class _TaskDetailState extends State<TaskDetailStateful> {
 
   bool _deleted = false;
 
+  Future<Task> _task;
+
   @override
   void initState() {
-    _status = "Incomplete";
 
     if (_status == "Incomplete")
       _markDoneBtnText = "Mark as complete";
     else
       _markDoneBtnText = "Mark as incomplete";
+
+    _task = _getTasksFromDB(int.parse(widget._taskId));
+    _task.then((task){
+      _status=task.status;
+    });
 
     super.initState();
   }
@@ -33,55 +46,62 @@ class _TaskDetailState extends State<TaskDetailStateful> {
           ? Center(
               child: Text("Successfully deleted the task"),
             )
-          : Column(
-              children: <Widget>[
-                Text("Task Title"),
-                Text(_status),
-                Text("Task Description"),
-                Row(
+          : FutureBuilder(
+              future: _task,
+              builder: (context, snapshot) {
+                if (snapshot.data == null)
+                  return Center(child: CircularProgressIndicator());
+                return Column(
                   children: <Widget>[
-                    RaisedButton(
-                      onPressed: () {
-                        if (_status == 'Incomplete')
-                          markAsComplete();
-                        else
-                          markAsIncomplete();
-                      },
-                      child: Text(_markDoneBtnText),
-                    ),
-                    RaisedButton(
-                      onPressed: () {
-                        showDialog<void>(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Delete task'),
-                              content: Text('Confirm?'),
-                              actions: <Widget>[
-                                FlatButton(
-                                  child: Text('Delete'),
-                                  onPressed: () {
-                                    _deleteTask();
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                FlatButton(
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
+                    Text(snapshot.data.title),
+                    Text(_status),
+                    Text(snapshot.data.desc),
+                    Row(
+                      children: <Widget>[
+                        RaisedButton(
+                          onPressed: () {
+                            if (_status == 'Incomplete')
+                              markAsComplete();
+                            else
+                              markAsIncomplete();
+                          },
+                          child: Text(_markDoneBtnText),
+                        ),
+                        RaisedButton(
+                          onPressed: () {
+                            showDialog<void>(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Delete task'),
+                                  content: Text('Confirm?'),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text('Delete'),
+                                      onPressed: () {
+                                        _deleteTask();
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text('Cancel'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      child: Text("Delete task"),
+                          child: Text("Delete task"),
+                        )
+                      ],
                     )
                   ],
-                )
-              ],
+                );
+              },
             ),
     );
   }
@@ -102,7 +122,32 @@ class _TaskDetailState extends State<TaskDetailStateful> {
 
   void _deleteTask() {
     setState(() {
-      _deleted=true;
+      _deleted = true;
     });
+  }
+
+  Future<Task> _getTasksFromDB(int taskId) async {
+    final database = await openDatabase(
+      join(await getDatabasesPath(), 'todo_database.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER, title TEXT, desc TEXT,status TEXT)",
+        );
+      },
+      version: 1,
+    );
+
+    List<Map> maps =
+        await database.query('tasks', where: 'id = ?', whereArgs: [taskId]);
+    if (maps.length > 0) {
+      return Task(
+        maps.first['user_id'].toString(),
+        maps.first['id'].toString(),
+        maps.first['title'],
+        maps.first['desc'],
+        maps.first['status'],
+      );
+    }
+    return null;
   }
 }
