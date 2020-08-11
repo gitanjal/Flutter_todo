@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/Task.dart';
 import 'package:flutter_todo/add_task.dart';
+import 'package:flutter_todo/database_helper.dart';
 import 'package:flutter_todo/task_detail.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -81,26 +82,6 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
   }
 
   Future<List<Task>> _getTasksFromDB() async {
-    final database = await openDatabase(
-      join(await getDatabasesPath(), 'todo_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER, title TEXT, desc TEXT,status TEXT)",
-        );
-      },
-      version: 1,
-    );
-
-    final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
-
-    return List.generate(taskMaps.length, (index) {
-      return Task(
-        taskMaps[index]['user_id'].toString(),
-        taskMaps[index]['id'].toString(),
-        taskMaps[index]['title'],
-        taskMaps[index]['desc'],
-        taskMaps[index]['status'],
-      );
-    });
+    return DatabaseHelper().getTasksFromDB();
   }
 }
