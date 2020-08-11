@@ -57,6 +57,22 @@ class DatabaseHelper {
     });
   }
 
+  Future<Task> getATaskFromDB(int taskId) async {
 
+    _database=await database;
+
+    List<Map> maps =
+    await _database.query('tasks', where: 'id = ?', whereArgs: [taskId]);
+    if (maps.length > 0) {
+      return Task(
+        maps.first['user_id'].toString(),
+        maps.first['id'].toString(),
+        maps.first['title'],
+        maps.first['desc'],
+        maps.first['status'],
+      );
+    }
+    return null;
+  }
 
 }
