@@ -38,7 +38,7 @@ class DatabaseHelper {
     return row;
   }
 
-  Future<List<Task>> _getTasksFromDB() async {
+  Future<List<Task>> getTasksFromDB() async {
 
     _database = await database;
 
