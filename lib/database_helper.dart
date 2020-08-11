@@ -1,6 +1,8 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'Task.dart';
+
 class DatabaseHelper {
   static DatabaseHelper _instance = new DatabaseHelper._internal();
   Database _database;
@@ -34,6 +36,25 @@ class DatabaseHelper {
     _database=await database;
     int row = await _database.insert('tasks', task);
     return row;
+  }
+
+
+  Future<List<Task>> getTasksFromDB() async {
+    final database =await openDatabase(
+      join(await getDatabasesPath(), 'todo_database.db'),
+    );
+
+    final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
+
+    return List.generate(taskMaps.length, (index) {
+      return Task(
+        taskMaps[index]['user_id'].toString(),
+        taskMaps[index]['id'].toString(),
+        taskMaps[index]['title'],
+        taskMaps[index]['desc'],
+        taskMaps[index]['status'],
+      );
+    });
   }
 
 
