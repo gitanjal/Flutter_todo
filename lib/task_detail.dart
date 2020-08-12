@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/Task.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:flutter_todo/database_helper.dart';
 
 class TaskDetailStateful extends StatefulWidget {
   final String _taskId;
@@ -107,6 +106,9 @@ class _TaskDetailState extends State<TaskDetailStateful> {
   }
 
   void markAsComplete() {
+
+    
+
     setState(() {
       _status = 'Complete';
       _markDoneBtnText = "Mark as incomplete";
@@ -127,27 +129,6 @@ class _TaskDetailState extends State<TaskDetailStateful> {
   }
 
   Future<Task> _getTasksFromDB(int taskId) async {
-    final database = await openDatabase(
-      join(await getDatabasesPath(), 'todo_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER, title TEXT, desc TEXT,status TEXT)",
-        );
-      },
-      version: 1,
-    );
-
-    List<Map> maps =
-        await database.query('tasks', where: 'id = ?', whereArgs: [taskId]);
-    if (maps.length > 0) {
-      return Task(
-        maps.first['user_id'].toString(),
-        maps.first['id'].toString(),
-        maps.first['title'],
-        maps.first['desc'],
-        maps.first['status'],
-      );
-    }
-    return null;
+    return DatabaseHelper().getATasksFromDB(taskId);
   }
 }

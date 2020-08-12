@@ -55,4 +55,30 @@ class DatabaseHelper {
     });
   }
 
+
+  Future<Task> getATasksFromDB(int taskId) async {
+
+    _database=await database;
+
+    List<Map> maps =
+    await _database.query('tasks', where: 'id = ?', whereArgs: [taskId]);
+    if (maps.length > 0) {
+      return Task(
+        maps.first['user_id'].toString(),
+        maps.first['id'].toString(),
+        maps.first['title'],
+        maps.first['desc'],
+        maps.first['status'],
+      );
+    }
+    return null;
+  }
+
+
+  Future<int> update(Map task) async {
+    _database=await database;
+    return await _database.update('tasks', task,
+        where: 'id = ?', whereArgs: [task['id']]);
+  }
+
 }
