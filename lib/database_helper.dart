@@ -74,11 +74,15 @@ class DatabaseHelper {
     return null;
   }
 
-
-  Future<int> update(Map task) async {
+  Future<int> update(Map task,int id) async {
     _database=await database;
     return await _database.update('tasks', task,
-        where: 'id = ?', whereArgs: [task['id']]);
+        where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> delete(int id) async {
+    _database=await database;
+    return await _database.delete('tasks', where: 'id = ?', whereArgs: [id]);
   }
 
 }

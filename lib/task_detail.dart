@@ -18,30 +18,37 @@ class _TaskDetailState extends State<TaskDetailStateful> {
   String _markDoneBtnText;
 
   bool _deleted = false;
+  bool _loading= true;
 
   Future<Task> _task;
 
+
   @override
   void initState() {
-
+    super.initState();
     if (_status == "Incomplete")
       _markDoneBtnText = "Mark as complete";
     else
       _markDoneBtnText = "Mark as incomplete";
 
-    _task = _getTasksFromDB(int.parse(widget._taskId));
+    _task = _getATaskFromDB(int.parse(widget._taskId));
     _task.then((task){
       _status=task.status;
+      _loading=false;
+
+      setState(() {
+      });
     });
 
-    super.initState();
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: (_deleted)
+      body:(_loading)?CircularProgressIndicator()
+          : (_deleted)
           ? Center(
               child: Text("Successfully deleted the task"),
             )
@@ -53,18 +60,18 @@ class _TaskDetailState extends State<TaskDetailStateful> {
                 return Column(
                   children: <Widget>[
                     Text(snapshot.data.title),
-                    Text(_status),
+                    Text(snapshot.data.status),
                     Text(snapshot.data.desc),
                     Row(
                       children: <Widget>[
                         RaisedButton(
                           onPressed: () {
-                            if (_status == 'Incomplete')
+                            if (snapshot.data.status == 'Incomplete')
                               markAsComplete();
                             else
                               markAsIncomplete();
                           },
-                          child: Text(_markDoneBtnText),
+                          child: Text((snapshot.data.status == 'Incomplete')?'Mark complete':'Mark incomplete'),
                         ),
                         RaisedButton(
                           onPressed: () {
@@ -105,30 +112,77 @@ class _TaskDetailState extends State<TaskDetailStateful> {
     );
   }
 
-  void markAsComplete() {
-
-    
+  Future<void> markAsComplete() async {
 
     setState(() {
-      _status = 'Complete';
-      _markDoneBtnText = "Mark as incomplete";
+      _loading=true;
+    });
+
+    Task task=await _task;
+
+    Map<String, dynamic> map = {
+      'title': task.title,
+      'desc': task.desc,
+      'user_id': 1,
+      'status': 'Complete'
+    };
+
+    int row_id=await DatabaseHelper().update(map,int.parse(task.taskId));
+
+    print('updated row---$row_id');
+    if(row_id>=0) {
+      setState(() {
+//        _status = 'Complete';
+//        _markDoneBtnText = "Mark as incomplete";
+        _task=_getATaskFromDB(int.parse(task.taskId));
+        _loading=false;
+      });
+    }
+  }
+
+  void markAsIncomplete() async{
+
+    setState(() {
+      _loading=true;
+    });
+
+    Task task=await _task;
+
+    Map<String, dynamic> map = {
+      'title': task.title,
+      'desc': task.desc,
+      'user_id': 1,
+      'status': 'Incomplete'
+    };
+
+    int row_id=await DatabaseHelper().update(map,int.parse(task.taskId));
+
+
+    setState(() {
+//      _status = 'Incomplete';
+//      _markDoneBtnText = "Mark as complete";
+      _task=_getATaskFromDB(int.parse(task.taskId));
+      _loading=false;
     });
   }
 
-  void markAsIncomplete() {
+  Future<void> _deleteTask() async {
     setState(() {
-      _status = 'Incomplete';
-      _markDoneBtnText = "Mark as complete";
+      _loading = true;
     });
+
+    Task task=await _task;
+    int rowsAffected=await DatabaseHelper().delete(int.parse(task.taskId));
+
+    if(rowsAffected==1) {
+      setState(() {
+        _deleted = true;
+        _loading = false;
+      });
+    }
   }
 
-  void _deleteTask() {
-    setState(() {
-      _deleted = true;
-    });
-  }
-
-  Future<Task> _getTasksFromDB(int taskId) async {
+  Future<Task> _getATaskFromDB(int taskId) async {
     return DatabaseHelper().getATasksFromDB(taskId);
   }
 }
