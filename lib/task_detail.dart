@@ -14,26 +14,18 @@ class TaskDetailStateful extends StatefulWidget {
 }
 
 class _TaskDetailState extends State<TaskDetailStateful> {
-  String _status;
-  String _markDoneBtnText;
 
   bool _deleted = false;
   bool _loading= true;
 
   Future<Task> _task;
 
-
   @override
   void initState() {
     super.initState();
-    if (_status == "Incomplete")
-      _markDoneBtnText = "Mark as complete";
-    else
-      _markDoneBtnText = "Mark as incomplete";
 
     _task = _getATaskFromDB(int.parse(widget._taskId));
     _task.then((task){
-      _status=task.status;
       _loading=false;
 
       setState(() {
@@ -132,8 +124,6 @@ class _TaskDetailState extends State<TaskDetailStateful> {
     print('updated row---$row_id');
     if(row_id>=0) {
       setState(() {
-//        _status = 'Complete';
-//        _markDoneBtnText = "Mark as incomplete";
         _task=_getATaskFromDB(int.parse(task.taskId));
         _loading=false;
       });
@@ -155,15 +145,14 @@ class _TaskDetailState extends State<TaskDetailStateful> {
       'status': 'Incomplete'
     };
 
-    int row_id=await DatabaseHelper().update(map,int.parse(task.taskId));
+    int rowsAffected=await DatabaseHelper().update(map,int.parse(task.taskId));
 
-
-    setState(() {
-//      _status = 'Incomplete';
-//      _markDoneBtnText = "Mark as complete";
-      _task=_getATaskFromDB(int.parse(task.taskId));
-      _loading=false;
-    });
+    if(rowsAffected==1) {
+      setState(() {
+        _task = _getATaskFromDB(int.parse(task.taskId));
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _deleteTask() async {
