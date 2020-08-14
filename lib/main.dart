@@ -22,12 +22,12 @@ class ListScreenWidget extends StatefulWidget {
 }
 
 class _ListScreenWidgetState extends State<ListScreenWidget> {
-  Future<List<Task>> taskList;
+  Future<List<Task>> _taskList;
 
   @override
   void initState() {
     super.initState();
-    taskList = _getTasksFromDB();
+    _taskList = _getTasksFromDB();
   }
 
   @override
@@ -39,13 +39,17 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddTask()),
-          );
+          ).then((value){
+            setState(() {
+              _taskList=_getTasksFromDB();
+            });
+          });
         },
       ),
       appBar: AppBar(),
       body: Container(
         child: FutureBuilder(
-        future: taskList,
+        future: _taskList,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return Center(
@@ -68,7 +72,9 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
                           MaterialPageRoute(
                               builder: (context) => TaskDetailStateful(snapshot.data[index].taskId)),
                         ).then((value) {
-                          setState(() {});
+                          setState(() {
+                            _taskList=_getTasksFromDB();
+                          });
                         });
                       },
                       title: Text("${snapshot.data[index].title}"),
