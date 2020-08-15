@@ -42,7 +42,7 @@ class DatabaseHelper {
 
     _database = await database;
 
-    final List<Map<String, dynamic>> taskMaps = await _database.query('tasks');
+    final List<Map<String, dynamic>> taskMaps = await _database.query('tasks',orderBy: 'id desc');
 
     return List.generate(taskMaps.length, (index) {
       return Task(

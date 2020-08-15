@@ -12,7 +12,8 @@ void main() => runApp(TodoApp());
 class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: ListScreenWidget());
+    return MaterialApp(
+        home: ListScreenWidget());
   }
 }
 
@@ -39,16 +40,18 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddTask()),
-          ).then((value){
+          ).then((value) {
             setState(() {
-              _taskList=_getTasksFromDB();
+              _taskList = _getTasksFromDB();
             });
           });
         },
       ),
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('WhatTodo'),
+      ),
       body: Container(
-        child: FutureBuilder(
+          child: FutureBuilder(
         future: _taskList,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
@@ -61,8 +64,10 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
                 child: Text('No data'),
               );
             } else
-              return ListView.builder(
+              return ListView.separated(
                   itemCount: snapshot.data.length,
+                  separatorBuilder: (BuildContext context, int index) =>
+                      Divider(),
                   itemBuilder: (context, index) {
                     return ListTile(
                       onTap: () {
@@ -70,15 +75,26 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => TaskDetailStateful(snapshot.data[index].taskId)),
+                              builder: (context) => TaskDetailStateful(
+                                  snapshot.data[index].taskId)),
                         ).then((value) {
                           setState(() {
-                            _taskList=_getTasksFromDB();
+                            _taskList = _getTasksFromDB();
                           });
                         });
                       },
                       title: Text("${snapshot.data[index].title}"),
-                      subtitle: Text("${snapshot.data[index].status}"),
+                      subtitle: Text(
+                        "${snapshot.data[index].status}",
+                        style: TextStyle(
+                            color:
+                                (snapshot.data[index].status == 'Complete')
+                                    ? Colors.greenAccent
+                                    : Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                        ),
+                      ),
                     );
                   });
           }
