@@ -6,21 +6,17 @@ class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(),
-        body:ListScreenWidget()
-      ),
+      home: ListScreenWidget(),
     );
   }
 }
 
-class ListScreenWidget extends StatelessWidget{
+class ListScreenWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text("Hello world"),
+    return Scaffold(
+      appBar: AppBar(),
+      body: Text('Hello world'),
     );
   }
 }
-
-
