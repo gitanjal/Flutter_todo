@@ -13,7 +13,7 @@ class TodoApp extends StatelessWidget {
 }
 
 class ListScreenWidget extends StatelessWidget {
-   List<Task> _taskList=generateDummyTasks();
+   final List<Task> _taskList=generateDummyTasks();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,6 +22,9 @@ class ListScreenWidget extends StatelessWidget {
           itemCount: _taskList.length,
           itemBuilder: (BuildContext context,int index){
             return ListTile(
+              onTap:(){
+                print('Clicked Task ${_taskList[index].title}');
+              },
               title: Text(_taskList[index].title),
               subtitle: Text(_taskList[index].status),
             );
