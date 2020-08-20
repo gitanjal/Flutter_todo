@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/Task.dart';
+import 'package:flutter_todo/task.dart';
 import 'package:flutter_todo/task_detail.dart';
 
 void main() => runApp(TodoApp());
@@ -27,7 +26,7 @@ class ListScreenWidget extends StatelessWidget {
                   print("${taskList[index].title}");
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => TaskDetailStateful()),
+                    MaterialPageRoute(builder: (context) => TaskDetail()),
                   );
                 },
                 title: Text("${taskList[index].title}"),
