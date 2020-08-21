@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/Task.dart';
-import 'package:flutter_todo/add_task.dart';
+import 'package:flutter_todo/task.dart';
 import 'package:flutter_todo/task_detail.dart';
+
+import 'add_task.dart';
 
 void main() => runApp(TodoApp());
 
@@ -20,14 +20,10 @@ class ListScreenWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AddTask()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>AddTask()));
         },
+        child: Icon(Icons.add),
       ),
       appBar: AppBar(),
       body: Container(
@@ -40,7 +36,7 @@ class ListScreenWidget extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => TaskDetailStateful()),
+                          builder: (context) => TaskDetail()),
                     );
                   },
                   title: Text("${taskList[index].title}"),
