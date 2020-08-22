@@ -9,9 +9,8 @@ class _AddTaskState extends State<AddTask> {
 
   final _formKey=GlobalKey<FormState>();
 
-  final controllerTitle = TextEditingController();
-  final controllerDesc = TextEditingController();
-
+  final _controllerTitle=TextEditingController();
+  final _controllerDesc=TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,27 +20,23 @@ class _AddTaskState extends State<AddTask> {
         child: Column(
           children: <Widget>[
             TextFormField(
-              controller: controllerTitle,
-              decoration: InputDecoration(hintText: 'Task title'),
+              controller: _controllerTitle,
+              decoration: InputDecoration(hintText: 'Enter the title'),
               validator: (value){
                 if(value.isEmpty)
-                  {
-                    return 'Please enter a title';
-                  }
+                  return 'Please enter a title';
+
                 return null;
               },
             ),
             TextFormField(
-              controller: controllerDesc,
-              minLines: 10,
-              maxLines: 10,
-              decoration: InputDecoration(hintText: 'Task description'),
+              controller: _controllerDesc,
+              decoration: InputDecoration(hintText: 'Enter the description'),
             ),
             RaisedButton(
               onPressed: () {
-                if(_formKey.currentState.validate()) {
-                  print('Task title is ${controllerTitle.text}');
-                }
+                if(_formKey.currentState.validate())
+                  print('The title entered is : ${_controllerTitle.text}');
               },
               child: Text('Add Task'),
             )
