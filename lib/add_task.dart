@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/Task.dart';
-import 'package:flutter_todo/database_helper.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -63,7 +61,17 @@ class _AddTaskState extends State<AddTask> {
   }
 
   _addToDB(Map task) async {
-    int row =await DatabaseHelper().addTask(task);
-    print('---------$row');
+    final database = await openDatabase(
+      join(await getDatabasesPath(), 'todo_database.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER, title TEXT, desc TEXT,status TEXT)",
+        );
+      },
+      version: 1,
+    );
+
+    int row = await database.insert('tasks', task);
+    print('Id of the inserted item: $row');
   }
 }
