@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/Task.dart';
 import 'package:flutter_todo/database_helper.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -63,7 +62,8 @@ class _AddTaskState extends State<AddTask> {
   }
 
   _addToDB(Map task) async {
+
     int row =await DatabaseHelper().addTask(task);
-    print('---------$row');
+    print('Id of the inserted item: $row');
   }
 }

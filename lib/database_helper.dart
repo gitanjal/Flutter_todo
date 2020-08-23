@@ -1,24 +1,27 @@
+import 'package:flutter_todo/task.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'Task.dart';
-
 class DatabaseHelper {
-  static DatabaseHelper _instance = new DatabaseHelper._internal();
+
+  static DatabaseHelper _instance;
   Database _database;
 
-  factory DatabaseHelper() {
+  factory DatabaseHelper(){
+    if(_instance==null)
+      _instance=DatabaseHelper._internal();
+
     return _instance;
   }
 
   DatabaseHelper._internal();
 
-  Future<Database> get database async {
+  Future<Database> _initializeDB() async {
 
     if(_database!=null)
       return _database;
 
-    _database = await openDatabase(
+    final database = await openDatabase(
       join(await getDatabasesPath(), 'todo_database.db'),
       onCreate: (db, version) {
         return db.execute(
@@ -28,31 +31,55 @@ class DatabaseHelper {
       version: 1,
     );
 
-    return _database;
-
+    return database;
   }
 
-  Future<int> addTask(Map task) async {
-    _database=await database;
-    int row = await _database.insert('tasks', task);
-    return row;
+  Future<int> addTask(Map taskInfo) async {
+    _database=await _initializeDB();
+    return _database.insert('tasks', taskInfo);
   }
 
-  Future<List<Task>> getTasksFromDB() async {
+  Future<List<Task>> getTasks() async{
+    _database=await _initializeDB();
 
-    _database = await database;
+    List<Map> taskMaps=await _database.query('tasks',orderBy: 'id desc');
 
-    final List<Map<String, dynamic>> taskMaps = await _database.query('tasks');
-
-    return List.generate(taskMaps.length, (index) {
+    List<Task> tasks=List.generate(taskMaps.length, (index) {
       return Task(
-        taskMaps[index]['user_id'].toString(),
+        taskMaps[index]['userId'].toString(),
         taskMaps[index]['id'].toString(),
         taskMaps[index]['title'],
         taskMaps[index]['desc'],
-        taskMaps[index]['status'],
+        taskMaps[index]['status']
       );
     });
+
+    return tasks;
   }
 
+  Future<Task> getTask(int taskId) async{
+
+    _database=await _initializeDB();
+
+    List<Map> taskMap=await _database.query('tasks',where: 'id=?',whereArgs: [taskId]);
+
+    return Task(
+        taskMap.first['userId'].toString(),
+        taskMap.first['id'].toString(),
+        taskMap.first['title'],
+        taskMap.first['desc'],
+        taskMap.first['status']
+    );
+  }
+
+  Future<int> deleteTask(int taskId) async{
+
+    _database=await _initializeDB();
+    return await _database.delete('tasks',where: 'id=?',whereArgs: [taskId]);
+  }
+
+  Future<int> updateTask(int taskId, Map taskInfo) async{
+    _database=await _initializeDB();
+    return await _database.update('tasks', taskInfo,where: 'id=?',whereArgs: [taskId]);
+  }
 }
