@@ -72,9 +72,14 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> deleteTask(int taskId) {
+  Future<int> deleteTask(int taskId) async{
 
+    _database=await _initializeDB();
+    return await _database.delete('tasks',where: 'id=?',whereArgs: [taskId]);
   }
 
-  Future<int> updateTask(int taskId, Map taskInfo) {}
+  Future<int> updateTask(int taskId, Map taskInfo) async{
+    _database=await _initializeDB();
+    return await _database.update('tasks', taskInfo,where: 'id=?',whereArgs: [taskId]);
+  }
 }
