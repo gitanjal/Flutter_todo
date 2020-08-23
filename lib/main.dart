@@ -82,6 +82,6 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
   }
 
   Future<List<Task>> _getTasksFromDB() async {
-    return DatabaseHelper().getTasksFromDB();
+    return DatabaseHelper().getTasks();
   }
 }
