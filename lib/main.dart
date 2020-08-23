@@ -40,7 +40,7 @@ class ListScreenWidget extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => TaskDetailStateful()),
+                          builder: (context) => TaskDetail()),
                     );
                   },
                   title: Text("${taskList[index].title}"),
