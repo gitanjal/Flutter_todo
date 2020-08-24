@@ -61,7 +61,7 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => TaskDetail()),
+                                  builder: (context) => TaskDetail(int.parse(snapshot.data[index].taskId))),
                             );
                           },
                           title: Text("${snapshot.data[index].title}"),
