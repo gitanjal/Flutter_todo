@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/database_helper.dart';
 import 'package:flutter_todo/task.dart';
 import 'package:flutter_todo/add_task.dart';
 import 'package:flutter_todo/task_detail.dart';
@@ -13,8 +14,20 @@ class TodoApp extends StatelessWidget {
   }
 }
 
-class ListScreenWidget extends StatelessWidget {
-  final List<Task> taskList = getDummyTaskList();
+class ListScreenWidget extends StatefulWidget {
+  @override
+  _ListScreenWidgetState createState() => _ListScreenWidgetState();
+}
+
+class _ListScreenWidgetState extends State<ListScreenWidget> {
+
+  Future<List<Task>> _tasks;
+
+  @override
+  void initState() {
+    super.initState();
+    _tasks=DatabaseHelper().getTasks();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,29 +37,40 @@ class ListScreenWidget extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => AddTask()),
+            MaterialPageRoute(builder: (context) => AddTask()),
           );
         },
       ),
       appBar: AppBar(),
       body: Container(
-          child: ListView.builder(
-              itemCount: taskList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  onTap: () {
-                    print("${taskList[index].title}");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => TaskDetail()),
-                    );
-                  },
-                  title: Text("${taskList[index].title}"),
-                  subtitle: Text("${taskList[index].status}"),
-                );
-              })),
+          child: FutureBuilder(
+            future: _tasks,
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if(snapshot.data==null)
+                {
+                  return Center(child: CircularProgressIndicator());
+                }
+              else
+                {
+                  return ListView.builder(
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          onTap: () {
+                            print("${snapshot.data[index].title}");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TaskDetail()),
+                            );
+                          },
+                          title: Text("${snapshot.data[index].title}"),
+                          subtitle: Text("${snapshot.data[index].status}"),
+                        );
+                      });
+                }
+            },
+      )),
     );
   }
 }
