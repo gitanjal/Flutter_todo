@@ -4,7 +4,7 @@ import 'package:flutter_todo/task.dart';
 
 class TaskDetail extends StatefulWidget {
 
-  int taskId;
+  final int taskId;
   TaskDetail(this.taskId);
 
   @override
