@@ -38,7 +38,11 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddTask()),
-          );
+          ).then((value){
+            setState(() {
+              _tasks=DatabaseHelper().getTasks();
+            });
+          });
         },
       ),
       appBar: AppBar(),

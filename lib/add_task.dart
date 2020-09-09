@@ -10,6 +10,7 @@ class AddTask extends StatefulWidget {
 
 class _AddTaskState extends State<AddTask> {
   final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey=GlobalKey<ScaffoldState>();
 
   final controllerTitle = TextEditingController();
   final controllerDesc = TextEditingController();
@@ -18,6 +19,7 @@ class _AddTaskState extends State<AddTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(),
       body: Form(
         key: _formKey,
@@ -65,5 +67,23 @@ class _AddTaskState extends State<AddTask> {
 
     int row =await DatabaseHelper().addTask(task);
     print('Id of the inserted item: $row');
+
+    if(row==-1)
+      {
+        //error occurred
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(content: Text('Failed to add the Task'),)
+        );
+      }
+    else
+      {
+        //Task inserted into the DB
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text('Task added successfully'),)
+        );
+
+        _formKey.currentState.reset();
+      }
+
   }
 }
