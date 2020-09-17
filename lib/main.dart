@@ -22,7 +22,7 @@ class ListScreenWidget extends StatelessWidget {
           itemCount: _taskList.length,
           itemBuilder: (BuildContext context,int index){
             return ListTile(
-              onTap:(){
+              onTap: (){
                 print('Clicked Task ${_taskList[index].title}');
               },
               title: Text(_taskList[index].title),
