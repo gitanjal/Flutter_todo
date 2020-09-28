@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 class AddTask extends StatefulWidget {
   @override
@@ -43,13 +45,14 @@ class _AddTaskState extends State<AddTask> {
                 if (_formKey.currentState.validate()) {
                   print('Task title is ${controllerTitle.text}');
 
-                  Map<String, dynamic> map = {
-                    'title': controllerTitle.text,
-                    'desc': controllerDesc.text,
-                    'user_id': 1,
-                    'status': 'Incomplete'
+                  Map<String,dynamic> task={
+                    'title':controllerTitle.text,
+                    'desc':controllerDesc.text,
+                    'user_id':1,
+                    'status':'Incomplete',
                   };
-                  _addToDB(map);
+
+                  _addToDB(task);
                 }
               },
               child: Text('Add Task'),
@@ -60,18 +63,39 @@ class _AddTaskState extends State<AddTask> {
     );
   }
 
-  _addToDB(Map task) async {
-    final database = await openDatabase(
-      join(await getDatabasesPath(), 'todo_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER, title TEXT, desc TEXT,status TEXT)",
-        );
+  _addToDB(Map task) async{
+    final database=await openDatabase(
+      join(await getDatabasesPath(),'todo_database.db'),
+      onCreate: (db,version){
+        return db.execute("CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER,title TEXT,desc TEXT,status TEXT)");
       },
       version: 1,
     );
 
-    int row = await database.insert('tasks', task);
-    print('Id of the inserted item: $row');
+    int row=await database.insert('tasks',task);
+    print('Id of the inserted row $row');
   }
+
+  _addToDBB(Map task) {
+
+    getDatabasesPath().then((path){
+      final database= openDatabase(
+        join(path,'todo_database.db'),
+        onCreate: (db,version){
+          return db.execute("CREATE TABLE tasks(id INTEGER PRIMARY KEY,user_id INTEGER,title TEXT,desc TEXT,status TEXT)");
+        },
+        version: 1,
+      );
+      database.then((database){
+         database.insert('tasks',task).then((row){
+           print('Id of the inserted row --- $row');
+         });
+
+      });
+    });
+
+
+
+  }
+
 }
