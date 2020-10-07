@@ -63,7 +63,9 @@ class _AddTaskState extends State<AddTask> {
 
   _addToDB(Map task) async {
 
-    int row =await DatabaseHelper().addTask(task);
-    print('Id of the inserted item: $row');
+
+    int row=await DatabaseHelper().addTask(task);
+    print('Id of the inserted row $row');
+
   }
 }
