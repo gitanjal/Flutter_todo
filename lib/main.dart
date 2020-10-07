@@ -66,7 +66,11 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => TaskDetail(int.parse(snapshot.data[index].taskId))),
-                            );
+                            ).then((value){
+                              setState(() {
+                                _tasks=DatabaseHelper().getTasks();
+                              });
+                            });
                           },
                           title: Text("${snapshot.data[index].title}"),
                           subtitle: Text("${snapshot.data[index].status}"),
