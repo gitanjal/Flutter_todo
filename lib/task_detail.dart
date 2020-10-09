@@ -15,6 +15,7 @@ class TaskDetail extends StatefulWidget {
 
 class _TaskDetailState extends State<TaskDetail> {
   bool _deleted = false;
+  bool _loading=false;
   Future<Task> task;
 
   @override
@@ -28,7 +29,9 @@ class _TaskDetailState extends State<TaskDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(),
-        body: (_deleted)
+        body: (_loading)?
+              Center(child: CircularProgressIndicator())
+            :(_deleted)
             ? Center(child: Text('Task deleted successfully'))
             : FutureBuilder(
                 future: task,
@@ -46,7 +49,31 @@ class _TaskDetailState extends State<TaskDetail> {
                                 Row(
                                   children: <Widget>[
                                     RaisedButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        if(snapshot.data.status=='Incomplete')
+                                          {
+                                            Map<String,dynamic> newInfo={
+                                              'title':snapshot.data.title,
+                                              'desc':snapshot.data.desc,
+                                              'user_id':snapshot.data.userId,
+                                              'status':'Complete'
+                                            };
+
+                                            _updateStatus(newInfo, int.parse(snapshot.data.taskId));
+                                          }
+                                        else
+                                          {
+                                            Map<String,dynamic> newInfo={
+                                              'title':snapshot.data.title,
+                                              'desc':snapshot.data.desc,
+                                              'user_id':snapshot.data.userId,
+                                              'status':'Incomplete'
+                                            };
+                                            _updateStatus(newInfo, int.parse(snapshot.data.taskId));
+                                          }
+
+
+                                      },
                                       child: Text((snapshot.data.status=="Incomplete")?"Mark as Complete":"Mark as Incomplete"),
                                     ),
                                     RaisedButton(
@@ -61,7 +88,7 @@ class _TaskDetailState extends State<TaskDetail> {
                                                 actions: <Widget>[
                                                   FlatButton(
                                                     onPressed: () {
-                                                      _deleteTask();
+                                                      _deleteTask(int.parse(snapshot.data.taskId));
                                                     },
                                                     child: Text('Delete'),
                                                   ),
@@ -86,13 +113,49 @@ class _TaskDetailState extends State<TaskDetail> {
               ));
   }
 
-  void _deleteTask() {
-    print('Inside _deleteTask');
+  void _deleteTask(int taskId) async{
 
     setState(() {
-      _deleted = true;
+      _loading=true;
     });
+
+    print('Inside _deleteTask');
+
+    int rowsAffected=await DatabaseHelper().deleteTask(taskId);
+
+    if(rowsAffected==1) {
+      setState(() {
+        _deleted = true;
+      });
+    }
+
+    setState(() {
+    //  _loading=false;
+    });
+
 
     Navigator.of(context).pop();
   }
+
+
+  _updateStatus(Map updatedInfo,int taskId)
+  async{
+
+    setState(() {
+      _loading=true;
+    });
+
+
+    int rowsAffected=await DatabaseHelper().updateTask(taskId, updatedInfo);
+
+
+
+    setState(() {
+      task=DatabaseHelper().getTask(widget.taskId);
+      _loading=false;
+    });
+
+
+  }
+
 }
