@@ -5,7 +5,8 @@ import 'package:flutter_todo/task.dart';
 class TaskDetail extends StatefulWidget {
 
   final int taskId;
-  TaskDetail(this.taskId);
+  final String taskTitle;
+  TaskDetail(this.taskId,this.taskTitle);
 
   @override
   State<StatefulWidget> createState() {
@@ -28,7 +29,7 @@ class _TaskDetailState extends State<TaskDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(title: Text(widget.taskTitle),),
         body: (_loading)?
               Center(child: CircularProgressIndicator())
             :(_deleted)
@@ -41,72 +42,108 @@ class _TaskDetailState extends State<TaskDetail> {
                           return Center(child: CircularProgressIndicator());
                         else
                           {
-                            return Column(
-                              children: <Widget>[
-                                Text(snapshot.data.title),
-                                Text(snapshot.data.status),
-                                Text(snapshot.data.desc),
-                                Row(
-                                  children: <Widget>[
-                                    RaisedButton(
-                                      onPressed: () {
-                                        if(snapshot.data.status=='Incomplete')
-                                          {
-                                            Map<String,dynamic> newInfo={
-                                              'title':snapshot.data.title,
-                                              'desc':snapshot.data.desc,
-                                              'user_id':snapshot.data.userId,
-                                              'status':'Complete'
-                                            };
-
-                                            _updateStatus(newInfo, int.parse(snapshot.data.taskId));
-                                          }
-                                        else
-                                          {
-                                            Map<String,dynamic> newInfo={
-                                              'title':snapshot.data.title,
-                                              'desc':snapshot.data.desc,
-                                              'user_id':snapshot.data.userId,
-                                              'status':'Incomplete'
-                                            };
-                                            _updateStatus(newInfo, int.parse(snapshot.data.taskId));
-                                          }
-
-
-                                      },
-                                      child: Text((snapshot.data.status=="Incomplete")?"Mark as Complete":"Mark as Incomplete"),
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(snapshot.data.title,
+                                    style:TextStyle(fontSize: 25)
+                                  ),
+                                  Text(snapshot.data.status,
+                                    style: TextStyle(fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: (snapshot.data.status=='Complete')?Colors.green:Colors.blue,
                                     ),
-                                    RaisedButton(
-                                      onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                title: Text('Confirm delete'),
-                                                content: Text('Delete Task?'),
-                                                actions: <Widget>[
-                                                  FlatButton(
-                                                    onPressed: () {
-                                                      _deleteTask(int.parse(snapshot.data.taskId));
-                                                    },
-                                                    child: Text('Delete'),
-                                                  ),
-                                                  FlatButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context).pop();
-                                                    },
-                                                    child: Text('Cancel'),
-                                                  ),
-                                                ],
-                                              );
-                                            });
-                                      },
-                                      child: Text("Delete task"),
-                                    )
-                                  ],
-                                )
-                              ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10,bottom: 10),
+                                    child: Text(snapshot.data.desc),
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 2,
+                                        child: RaisedButton(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                            side:BorderSide(
+                                              color: Colors.grey,
+                                              width: 2,
+                                            )
+                                          ),
+                                          onPressed: () {
+                                            if(snapshot.data.status=='Incomplete')
+                                              {
+                                                Map<String,dynamic> newInfo={
+                                                  'title':snapshot.data.title,
+                                                  'desc':snapshot.data.desc,
+                                                  'user_id':snapshot.data.userId,
+                                                  'status':'Complete'
+                                                };
+
+                                                _updateStatus(newInfo, int.parse(snapshot.data.taskId));
+                                              }
+                                            else
+                                              {
+                                                Map<String,dynamic> newInfo={
+                                                  'title':snapshot.data.title,
+                                                  'desc':snapshot.data.desc,
+                                                  'user_id':snapshot.data.userId,
+                                                  'status':'Incomplete'
+                                                };
+                                                _updateStatus(newInfo, int.parse(snapshot.data.taskId));
+                                              }
+
+
+                                          },
+                                          child: Text((snapshot.data.status=="Incomplete")?"Mark as Complete":"Mark as Incomplete"),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 3,
+                                      ),
+                                      Expanded(
+                                        child: RaisedButton(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(16),
+                                              side:BorderSide(
+                                                color: Colors.grey,
+                                                width: 2,
+                                              )
+                                          ),
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: Text('Confirm delete'),
+                                                    content: Text('Delete Task?'),
+                                                    actions: <Widget>[
+                                                      FlatButton(
+                                                        onPressed: () {
+                                                          _deleteTask(int.parse(snapshot.data.taskId));
+                                                        },
+                                                        child: Text('Delete'),
+                                                      ),
+                                                      FlatButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context).pop();
+                                                        },
+                                                        child: Text('Cancel'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                });
+                                          },
+                                          child: Text("Delete task"),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
                             );
                           }
                     },

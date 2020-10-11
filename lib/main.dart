@@ -10,7 +10,13 @@ void main() => runApp(TodoApp());
 class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: ListScreenWidget());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.amber,
+      ),
+      home: ListScreenWidget(),
+    );
   }
 }
 
@@ -20,13 +26,12 @@ class ListScreenWidget extends StatefulWidget {
 }
 
 class _ListScreenWidgetState extends State<ListScreenWidget> {
-
   Future<List<Task>> _tasks;
 
   @override
   void initState() {
     super.initState();
-    _tasks=DatabaseHelper().getTasks();
+    _tasks = DatabaseHelper().getTasks();
   }
 
   @override
@@ -38,46 +43,54 @@ class _ListScreenWidgetState extends State<ListScreenWidget> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddTask()),
-          ).then((value){
+          ).then((value) {
             setState(() {
-              _tasks=DatabaseHelper().getTasks();
+              _tasks = DatabaseHelper().getTasks();
             });
           });
         },
       ),
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Todo list'),
+      ),
       body: Container(
           child: FutureBuilder(
-            future: _tasks,
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              if(snapshot.data==null)
-                {
-                  return Center(child: CircularProgressIndicator());
-                }
-              else
-                {
-                  return ListView.builder(
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          onTap: () {
-                            print("${snapshot.data[index].title}");
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TaskDetail(int.parse(snapshot.data[index].taskId))),
-                            ).then((value){
-                              setState(() {
-                                _tasks=DatabaseHelper().getTasks();
-                              });
-                            });
-                          },
-                          title: Text("${snapshot.data[index].title}"),
-                          subtitle: Text("${snapshot.data[index].status}"),
-                        );
+        future: _tasks,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.data == null) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    onTap: () {
+                      print("${snapshot.data[index].title}");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TaskDetail(
+                                int.parse(snapshot.data[index].taskId),snapshot.data[index].title)),
+                      ).then((value) {
+                        setState(() {
+                          _tasks = DatabaseHelper().getTasks();
+                        });
                       });
-                }
-            },
+                    },
+                    title: Text("${snapshot.data[index].title}"),
+                    subtitle: Text(
+                      "${snapshot.data[index].status}",
+                      style: TextStyle(
+                        color: (snapshot.data[index].status == 'Complete')
+                            ? Colors.green
+                            : Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                });
+          }
+        },
       )),
     );
   }
