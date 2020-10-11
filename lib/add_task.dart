@@ -44,7 +44,7 @@ class _AddTaskState extends State<AddTask> {
                     }
                     return null;
                   },
-                ),status
+                ),
                 SizedBox(height: 10,),
                 TextFormField(
                   controller: controllerDesc,
