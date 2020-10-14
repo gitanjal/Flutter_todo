@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Todo',
       theme: ThemeData(
-        primarySwatch: Colors.amber,
+        primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter Todo Home Page'),
     );
