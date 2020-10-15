@@ -47,7 +47,32 @@ class _TaskDetailState extends State<TaskDetail> {
                                 Row(
                                   children: <Widget>[
                                     RaisedButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+
+                                        if(snapshot.data.status=='Incomplete')
+                                        {
+                                          Map<String,dynamic> newInfo={
+                                            'title':snapshot.data.title,
+                                            'desc':snapshot.data.desc,
+                                            'user_id':snapshot.data.userId,
+                                            'status':'Complete'
+                                          };
+
+                                          _updateStatus(newInfo, int.parse(snapshot.data.taskId));
+                                        }
+                                        else
+                                        {
+                                          Map<String,dynamic> newInfo={
+                                            'title':snapshot.data.title,
+                                            'desc':snapshot.data.desc,
+                                            'user_id':snapshot.data.userId,
+                                            'status':'Incomplete'
+                                          };
+                                          _updateStatus(newInfo, int.parse(snapshot.data.taskId));
+                                        }
+
+
+                                      },
                                       child: Text((snapshot.data.status=="Incomplete")?"Mark as Complete":"Mark as Incomplete"),
                                     ),
                                     RaisedButton(
@@ -62,7 +87,7 @@ class _TaskDetailState extends State<TaskDetail> {
                                                 actions: <Widget>[
                                                   FlatButton(
                                                     onPressed: () {
-                                                      _deleteTask();
+                                                      _deleteTask(int.parse(snapshot.data.taskId));
                                                     },
                                                     child: Text('Delete'),
                                                   ),
