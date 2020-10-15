@@ -15,6 +15,7 @@ class TaskDetail extends StatefulWidget {
 
 class _TaskDetailState extends State<TaskDetail> {
   bool _deleted = false;
+  bool _loading = false;
   Future<Task> task;
 
   @override
@@ -86,13 +87,48 @@ class _TaskDetailState extends State<TaskDetail> {
               ));
   }
 
-  void _deleteTask() {
-    print('Inside _deleteTask');
+  void _deleteTask(int taskId) async{
 
     setState(() {
-      _deleted = true;
+      _loading=true;
     });
 
+    print('Inside _deleteTask');
+
+    int rowsAffected=await DatabaseHelper().deleteTask(taskId);
+
+    if(rowsAffected==1) {
+      setState(() {
+        _deleted = true;
+      });
+    }
+
+    setState(() {
+      //  _loading=false;
+    });
+
+
     Navigator.of(context).pop();
+  }
+
+
+  _updateStatus(Map updatedInfo,int taskId)
+  async{
+
+    setState(() {
+      _loading=true;
+    });
+
+
+    int rowsAffected=await DatabaseHelper().updateTask(taskId, updatedInfo);
+
+
+
+    setState(() {
+      task=DatabaseHelper().getTask(widget.taskId);
+      _loading=false;
+    });
+
+
   }
 }
